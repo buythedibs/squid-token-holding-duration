@@ -24,6 +24,9 @@ export class Cheque {
     @Column_("text", {nullable: true})
     tokenAddress!: string | undefined | null
 
+    @Column_("text", {nullable: true})
+    memo!: string | undefined | null
+
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     fee!: bigint
 

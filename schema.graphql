@@ -4,6 +4,7 @@ type Cheque @entity {
   to: String! @index
   amount: BigInt!
   tokenAddress: String
+  memo: String
   fee: BigInt!
   status: Int! @index
   createdAt: DateTime!

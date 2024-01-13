@@ -2,7 +2,7 @@ import {Abi, encodeCall, decodeResult} from "@subsquid/ink-abi"
 
 export const metadata = {
   "source": {
-    "hash": "0xe28f50056ad39cf5439975bb834b8b6bc74eabae0b90893ddd6b902e0ac2984a",
+    "hash": "0xdbc5ea6c5e50e97e531a930f70305875afd8c538b0259e81e203019f0d218929",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.72.1",
     "build_info": {
@@ -54,7 +54,7 @@ export const metadata = {
             "ink_primitives",
             "ConstructorResult"
           ],
-          "type": 5
+          "type": 6
         },
         "selector": "0x9bae9d5e"
       }
@@ -96,7 +96,7 @@ export const metadata = {
         "displayName": [
           "Timestamp"
         ],
-        "type": 18
+        "type": 19
       }
     },
     "events": [
@@ -154,7 +154,7 @@ export const metadata = {
               "displayName": [
                 "Option"
               ],
-              "type": 13
+              "type": 14
             }
           },
           {
@@ -166,6 +166,17 @@ export const metadata = {
                 "Balance"
               ],
               "type": 0
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "memo",
+            "type": {
+              "displayName": [
+                "Option"
+              ],
+              "type": 15
             }
           }
         ],
@@ -229,7 +240,7 @@ export const metadata = {
         "ink",
         "LangError"
       ],
-      "type": 7
+      "type": 8
     },
     "messages": [
       {
@@ -244,7 +255,7 @@ export const metadata = {
             "ink",
             "MessageResult"
           ],
-          "type": 8
+          "type": 9
         },
         "selector": "0x70714744"
       },
@@ -270,7 +281,7 @@ export const metadata = {
             "ink",
             "MessageResult"
           ],
-          "type": 10
+          "type": 11
         },
         "selector": "0xf1b0ace3"
       },
@@ -296,7 +307,7 @@ export const metadata = {
             "ink",
             "MessageResult"
           ],
-          "type": 10
+          "type": 11
         },
         "selector": "0x9796e9a7"
       },
@@ -322,7 +333,7 @@ export const metadata = {
             "ink",
             "MessageResult"
           ],
-          "type": 10
+          "type": 11
         },
         "selector": "0xfddedee7"
       },
@@ -352,7 +363,7 @@ export const metadata = {
               "displayName": [
                 "Option"
               ],
-              "type": 13
+              "type": 14
             }
           },
           {
@@ -361,7 +372,16 @@ export const metadata = {
               "displayName": [
                 "Option"
               ],
-              "type": 19
+              "type": 15
+            }
+          },
+          {
+            "label": "memo",
+            "type": {
+              "displayName": [
+                "Option"
+              ],
+              "type": 15
             }
           }
         ],
@@ -375,7 +395,7 @@ export const metadata = {
             "ink",
             "MessageResult"
           ],
-          "type": 10
+          "type": 11
         },
         "selector": "0xab700a1b"
       },
@@ -518,6 +538,35 @@ export const metadata = {
                             }
                           },
                           "name": "fee"
+                        },
+                        {
+                          "layout": {
+                            "enum": {
+                              "dispatchKey": "0xe28b2e12",
+                              "name": "Option",
+                              "variants": {
+                                "0": {
+                                  "fields": [],
+                                  "name": "None"
+                                },
+                                "1": {
+                                  "fields": [
+                                    {
+                                      "layout": {
+                                        "leaf": {
+                                          "key": "0xe28b2e12",
+                                          "ty": 5
+                                        }
+                                      },
+                                      "name": "0"
+                                    }
+                                  ],
+                                  "name": "Some"
+                                }
+                              }
+                            }
+                          },
+                          "name": "memo"
                         }
                       ],
                       "name": "Cheque"
@@ -613,12 +662,20 @@ export const metadata = {
       "id": 5,
       "type": {
         "def": {
+          "primitive": "str"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": {
+        "def": {
           "variant": {
             "variants": [
               {
                 "fields": [
                   {
-                    "type": 6
+                    "type": 7
                   }
                 ],
                 "index": 0,
@@ -627,7 +684,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 7
+                    "type": 8
                   }
                 ],
                 "index": 1,
@@ -639,11 +696,11 @@ export const metadata = {
         "params": [
           {
             "name": "T",
-            "type": 6
+            "type": 7
           },
           {
             "name": "E",
-            "type": 7
+            "type": 8
           }
         ],
         "path": [
@@ -652,7 +709,7 @@ export const metadata = {
       }
     },
     {
-      "id": 6,
+      "id": 7,
       "type": {
         "def": {
           "tuple": []
@@ -660,7 +717,7 @@ export const metadata = {
       }
     },
     {
-      "id": 7,
+      "id": 8,
       "type": {
         "def": {
           "variant": {
@@ -679,7 +736,7 @@ export const metadata = {
       }
     },
     {
-      "id": 8,
+      "id": 9,
       "type": {
         "def": {
           "variant": {
@@ -687,7 +744,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 9
+                    "type": 10
                   }
                 ],
                 "index": 0,
@@ -696,7 +753,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 7
+                    "type": 8
                   }
                 ],
                 "index": 1,
@@ -708,11 +765,11 @@ export const metadata = {
         "params": [
           {
             "name": "T",
-            "type": 9
+            "type": 10
           },
           {
             "name": "E",
-            "type": 7
+            "type": 8
           }
         ],
         "path": [
@@ -721,7 +778,7 @@ export const metadata = {
       }
     },
     {
-      "id": 9,
+      "id": 10,
       "type": {
         "def": {
           "composite": {
@@ -757,48 +814,6 @@ export const metadata = {
       }
     },
     {
-      "id": 10,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 11
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 7
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 11
-          },
-          {
-            "name": "E",
-            "type": 7
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
       "id": 11,
       "type": {
         "def": {
@@ -816,7 +831,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 14
+                    "type": 8
                   }
                 ],
                 "index": 1,
@@ -832,7 +847,7 @@ export const metadata = {
           },
           {
             "name": "E",
-            "type": 14
+            "type": 8
           }
         ],
         "path": [
@@ -842,6 +857,48 @@ export const metadata = {
     },
     {
       "id": 12,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 13
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 16
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 13
+          },
+          {
+            "name": "E",
+            "type": 16
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 13,
       "type": {
         "def": {
           "composite": {
@@ -868,7 +925,7 @@ export const metadata = {
               },
               {
                 "name": "token_address",
-                "type": 13,
+                "type": 14,
                 "typeName": "Option<AccountId>"
               },
               {
@@ -880,6 +937,11 @@ export const metadata = {
                 "name": "fee",
                 "type": 0,
                 "typeName": "Balance"
+              },
+              {
+                "name": "memo",
+                "type": 15,
+                "typeName": "Option<String>"
               }
             ]
           }
@@ -892,7 +954,7 @@ export const metadata = {
       }
     },
     {
-      "id": 13,
+      "id": 14,
       "type": {
         "def": {
           "variant": {
@@ -925,7 +987,40 @@ export const metadata = {
       }
     },
     {
-      "id": 14,
+      "id": 15,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "None"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 5
+                  }
+                ],
+                "index": 1,
+                "name": "Some"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 5
+          }
+        ],
+        "path": [
+          "Option"
+        ]
+      }
+    },
+    {
+      "id": 16,
       "type": {
         "def": {
           "variant": {
@@ -933,7 +1028,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 7,
+                    "type": 8,
                     "typeName": "LangError"
                   }
                 ],
@@ -947,7 +1042,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 15,
+                    "type": 5,
                     "typeName": "String"
                   }
                 ],
@@ -957,7 +1052,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 15,
+                    "type": 5,
                     "typeName": "String"
                   }
                 ],
@@ -967,7 +1062,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 16,
+                    "type": 17,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -977,7 +1072,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 15,
+                    "type": 5,
                     "typeName": "String"
                   }
                 ],
@@ -991,7 +1086,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 15,
+                    "type": 5,
                     "typeName": "String"
                   }
                 ],
@@ -1009,15 +1104,7 @@ export const metadata = {
       }
     },
     {
-      "id": 15,
-      "type": {
-        "def": {
-          "primitive": "str"
-        }
-      }
-    },
-    {
-      "id": 16,
+      "id": 17,
       "type": {
         "def": {
           "variant": {
@@ -1025,7 +1112,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 15,
+                    "type": 5,
                     "typeName": "String"
                   }
                 ],
@@ -1051,7 +1138,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 15,
+                    "type": 5,
                     "typeName": "String"
                   }
                 ],
@@ -1069,7 +1156,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 17,
+                    "type": 18,
                     "typeName": "NoncesError"
                   }
                 ],
@@ -1089,7 +1176,7 @@ export const metadata = {
       }
     },
     {
-      "id": 17,
+      "id": 18,
       "type": {
         "def": {
           "variant": {
@@ -1101,7 +1188,7 @@ export const metadata = {
                     "typeName": "AccountId"
                   },
                   {
-                    "type": 18,
+                    "type": 19,
                     "typeName": "u64"
                   }
                 ],
@@ -1125,44 +1212,11 @@ export const metadata = {
       }
     },
     {
-      "id": 18,
+      "id": 19,
       "type": {
         "def": {
           "primitive": "u64"
         }
-      }
-    },
-    {
-      "id": 19,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "index": 0,
-                "name": "None"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 15
-                  }
-                ],
-                "index": 1,
-                "name": "Some"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 15
-          }
-        ],
-        "path": [
-          "Option"
-        ]
       }
     },
     {
@@ -1183,7 +1237,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 7
+                    "type": 8
                   }
                 ],
                 "index": 1,
@@ -1199,7 +1253,7 @@ export const metadata = {
           },
           {
             "name": "E",
-            "type": 7
+            "type": 8
           }
         ],
         "path": [
@@ -1216,7 +1270,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 6
+                    "type": 7
                   }
                 ],
                 "index": 0,
@@ -1225,7 +1279,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 14
+                    "type": 16
                   }
                 ],
                 "index": 1,
@@ -1237,11 +1291,11 @@ export const metadata = {
         "params": [
           {
             "name": "T",
-            "type": 6
+            "type": 7
           },
           {
             "name": "E",
-            "type": 14
+            "type": 16
           }
         ],
         "path": [
@@ -1340,6 +1394,7 @@ export interface Event_Create {
     amount: Balance
     tokenAddress: (AccountId | undefined)
     fee: Balance
+    memo: (string | undefined)
 }
 
 export interface Event_Cancel {
@@ -1384,6 +1439,7 @@ export interface Message_create {
     amount: Balance
     tokenAddress: (AccountId | undefined)
     azeroId: (string | undefined)
+    memo: (string | undefined)
 }
 
 export interface Message_update_fee {
@@ -1422,6 +1478,7 @@ export interface Cheque {
     tokenAddress: (AccountId | undefined)
     status: number
     fee: Balance
+    memo: (string | undefined)
 }
 
 export type AzSafeSendError = AzSafeSendError_ContractCall | AzSafeSendError_IncorrectFee | AzSafeSendError_InkEnvError | AzSafeSendError_NotFound | AzSafeSendError_PSP22Error | AzSafeSendError_RecordsLimitReached | AzSafeSendError_Unauthorised | AzSafeSendError_UnprocessableEntity

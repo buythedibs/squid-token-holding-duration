@@ -19,7 +19,7 @@ export type Fields = SubstrateBatchProcessorFields<typeof processor>
 export type ProcessorContext<Store> = DataHandlerContext<Store, Fields>
 
 const SAFE_SEND_CONTRACT_ADDRESS_SS58 =
-  "5FF18McrzYWuUrEdz9sme3X9jSivKeRc6iejxVpp41EKswCM";
+  "5EvmKgK2wiPLnoa53KfsPBpzEpn9DZs54u73xPHL1JWQBzm2";
 const SAFE_SEND_CONTRACT_ADDRESS = toHex(ss58.decode(SAFE_SEND_CONTRACT_ADDRESS_SS58).bytes);
 const SS58_PREFIX = ss58.decode(SAFE_SEND_CONTRACT_ADDRESS_SS58).prefix;
 
@@ -42,7 +42,7 @@ const processor = new SubstrateBatchProcessor()
   .setBlockRange({
     // genesis block happens to not have a timestamp, so it's easier
     // to start from 1 in cases when the deployment height is unknown
-    from: 51672388
+    from: 51744020
   })
 
 processor.run(new TypeormDatabase({supportHotBlocks: true}), async ctx => {
@@ -57,6 +57,7 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async ctx => {
       to: cheque.to,
       amount: cheque.amount,
       tokenAddress: cheque.token_address,
+      memo: cheque.memo,
       fee: cheque.fee,
       status: 0,
       createdAt: cheque.created_at,
@@ -84,6 +85,7 @@ interface ChequeCreateEvent {
   to: string;
   amount: bigint;
   token_address?: string;
+  memo?: string;
   fee: bigint;
   created_at: Date;
 }
@@ -107,12 +109,13 @@ function extractCheques(ctx: ProcessorContext<Store>): ChequeCreateEvent[] {
       ) {
         const decodedEvent = azSafeSend.decodeEvent(event.args.data);
         if (decodedEvent.__kind === "Create") {
-          let cheque: ChequeCreateEvent = {
+          const cheque: ChequeCreateEvent = {
             id: String(decodedEvent.id),
             from: ss58.codec(SS58_PREFIX).encode(decodedEvent.from),
             to: ss58.codec(SS58_PREFIX).encode(decodedEvent.to),
             amount: decodedEvent.amount,
             token_address: undefined,
+            memo: decodedEvent.memo,
             fee: decodedEvent.fee,
             created_at: new Date(block.header.timestamp)
           };
