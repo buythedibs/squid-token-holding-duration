@@ -2,7 +2,7 @@ import {Abi, encodeCall, decodeResult} from "@subsquid/ink-abi"
 
 export const metadata = {
   "source": {
-    "hash": "0xdbc5ea6c5e50e97e531a930f70305875afd8c538b0259e81e203019f0d218929",
+    "hash": "0xa9ce1dccd4c08ae2294b4b2e43bc61e93863a7ca909ef9b5b299a6c261fa0e2b",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.72.1",
     "build_info": {
@@ -172,6 +172,28 @@ export const metadata = {
             "docs": [],
             "indexed": false,
             "label": "memo",
+            "type": {
+              "displayName": [
+                "Option"
+              ],
+              "type": 15
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "recipient_azero_id",
+            "type": {
+              "displayName": [
+                "Option"
+              ],
+              "type": 15
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "sender_azero_id",
             "type": {
               "displayName": [
                 "Option"
@@ -367,7 +389,7 @@ export const metadata = {
             }
           },
           {
-            "label": "azero_id",
+            "label": "memo",
             "type": {
               "displayName": [
                 "Option"
@@ -376,7 +398,16 @@ export const metadata = {
             }
           },
           {
-            "label": "memo",
+            "label": "recipient_azero_id",
+            "type": {
+              "displayName": [
+                "Option"
+              ],
+              "type": 15
+            }
+          },
+          {
+            "label": "sender_azero_id",
             "type": {
               "displayName": [
                 "Option"
@@ -1395,6 +1426,8 @@ export interface Event_Create {
     tokenAddress: (AccountId | undefined)
     fee: Balance
     memo: (string | undefined)
+    recipientAzeroId: (string | undefined)
+    senderAzeroId: (string | undefined)
 }
 
 export interface Event_Cancel {
@@ -1438,8 +1471,9 @@ export interface Message_create {
     to: AccountId
     amount: Balance
     tokenAddress: (AccountId | undefined)
-    azeroId: (string | undefined)
     memo: (string | undefined)
+    recipientAzeroId: (string | undefined)
+    senderAzeroId: (string | undefined)
 }
 
 export interface Message_update_fee {

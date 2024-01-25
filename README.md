@@ -35,7 +35,7 @@ Update squid.yaml and deploy as per [this](https://docs.subsquid.io/deploy-squid
 
 ```bash
 # add --hard-reset if you want to drop and re-create all the squid resources including the database.
-sqd deploy --org btngroup ../squid-safe-send
+sqd deploy --org btngroup ../squid-safe-send --hard-reset
 ```
 
 ## Dev flow

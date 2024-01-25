@@ -19,7 +19,7 @@ export type Fields = SubstrateBatchProcessorFields<typeof processor>
 export type ProcessorContext<Store> = DataHandlerContext<Store, Fields>
 
 const SAFE_SEND_CONTRACT_ADDRESS_SS58 =
-  "5EvmKgK2wiPLnoa53KfsPBpzEpn9DZs54u73xPHL1JWQBzm2";
+  "5EZJQm6g64rhajevm6k4NZmPgyiy95FUAk8Hdz1yaHWo83np";
 const SAFE_SEND_CONTRACT_ADDRESS = toHex(ss58.decode(SAFE_SEND_CONTRACT_ADDRESS_SS58).bytes);
 const SS58_PREFIX = ss58.decode(SAFE_SEND_CONTRACT_ADDRESS_SS58).prefix;
 
@@ -42,7 +42,7 @@ const processor = new SubstrateBatchProcessor()
   .setBlockRange({
     // genesis block happens to not have a timestamp, so it's easier
     // to start from 1 in cases when the deployment height is unknown
-    from: 51744020
+    from: 52780000
   })
 
 processor.run(new TypeormDatabase({supportHotBlocks: true}), async ctx => {
@@ -60,6 +60,8 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async ctx => {
       memo: cheque.memo,
       fee: cheque.fee,
       status: 0,
+      recipientAzeroId: cheque.recipient_azero_id,
+      senderAzeroId: cheque.sender_azero_id,
       createdAt: cheque.created_at,
       updatedAt: cheque.created_at,
     });
@@ -87,6 +89,8 @@ interface ChequeCreateEvent {
   token_address?: string;
   memo?: string;
   fee: bigint;
+  recipient_azero_id?: string;
+  sender_azero_id?: string;
   created_at: Date;
 }
 
@@ -117,6 +121,8 @@ function extractCheques(ctx: ProcessorContext<Store>): ChequeCreateEvent[] {
             token_address: undefined,
             memo: decodedEvent.memo,
             fee: decodedEvent.fee,
+            recipient_azero_id: decodedEvent.recipientAzeroId,
+            sender_azero_id: decodedEvent.senderAzeroId,
             created_at: new Date(block.header.timestamp)
           };
           if (decodedEvent.tokenAddress) {

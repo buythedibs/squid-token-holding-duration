@@ -34,6 +34,12 @@ export class Cheque {
     @Column_("int4", {nullable: false})
     status!: number
 
+    @Column_("text", {nullable: true})
+    recipientAzeroId!: string | undefined | null
+
+    @Column_("text", {nullable: true})
+    senderAzeroId!: string | undefined | null
+
     @Column_("timestamp with time zone", {nullable: false})
     createdAt!: Date
 
