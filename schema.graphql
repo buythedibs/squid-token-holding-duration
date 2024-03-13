@@ -1,4 +1,5 @@
 type Account @entity {
+  id: ID!
   wallet: String! @index
   token: String! @index
   balance: BigInt!
