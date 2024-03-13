@@ -1,7 +1,7 @@
 manifestVersion: subsquid.io/v0.1
-name: squid-safe-send
+name: squid-token-holding-duration
 version: 1
-description: Safe Send smart contract indexing on Aleph Zero Testnet.
+description: Track the number of days an address is holding a PSP22 or PSP34 token for airdrop calculation.
 build: 
 deploy:
   addons:
