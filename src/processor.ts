@@ -14,6 +14,7 @@ import {
 import { Store, TypeormDatabase } from "@subsquid/typeorm-store";
 import * as psp34 from "./abi/psp34";
 import { Account } from "./model/generated";
+import { BigDecimal } from "@subsquid/big-decimal";
 
 export type Block = BlockHeader<Fields>
 export type Event = _Event<Fields>
@@ -79,7 +80,7 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async ctx => {
       if (fromAccount) {
         fromAccount.balance -= transfer.amount;
         fromAccount.updatedAt = transfer.updated_at;
-        fromAccount.averageBalance = calculateRunningAverage(fromAccount.averageBalance, fromAccount.balance + transfer.amount, fromAccount.balance, fromAccount.updatedAt, tokenDetails.averageBalanceCalculatedFromTimestamp);
+        fromAccount.averageBalance = calculateRunningAverage(fromAccount.averageBalance, fromAccount.balance + transfer.amount, fromAccount.balance, fromAccount.updatedAt, tokenDetails.averageBalanceCalculatedFromTimestamp, fromAccount.wallet);
         await ctx.store.save(
           fromAccount
         );
@@ -95,11 +96,11 @@ processor.run(new TypeormDatabase({supportHotBlocks: true}), async ctx => {
         wallet: transfer.to,
         token: transfer.token,
         balance: transfer.amount,
-        averageBalance: BigInt(0),
+        averageBalance: BigDecimal(0),
         updatedAt: transfer.updated_at,
       });
     }
-    toAccount.averageBalance = calculateRunningAverage(toAccount.averageBalance, toAccount.balance - transfer.amount, toAccount.balance, toAccount.updatedAt, tokenDetails.averageBalanceCalculatedFromTimestamp);
+    toAccount.averageBalance = calculateRunningAverage(toAccount.averageBalance, toAccount.balance - transfer.amount, toAccount.balance, toAccount.updatedAt, tokenDetails.averageBalanceCalculatedFromTimestamp, toAccount.wallet);
     await ctx.store.save(
       toAccount
     );
@@ -114,14 +115,19 @@ interface TransferEvent {
   updated_at: bigint;
 }
 
-function calculateRunningAverage(average: bigint, oldBalance: bigint, newBalance: bigint, newUpdatedAt: bigint, startTime: number) {
-  const totalTime: bigint = BigInt(END_TIMESTAMP - startTime);
-  const bMultiplicationFactor: bigint = BigInt(MULTIPLICATION_FACTOR);
-  const timeLeft: bigint = BigInt(END_TIMESTAMP) - newUpdatedAt;
-  const amountToRemove: bigint = bMultiplicationFactor * oldBalance * timeLeft / totalTime;
-  average -= amountToRemove;
-  const amountToAdd: bigint = bMultiplicationFactor * newBalance * timeLeft / totalTime
-  return average + amountToAdd
+function calculateRunningAverage(average: BigDecimal, oldBalance: bigint, newBalance: bigint, newUpdatedAt: bigint, startTime: number, wallet: string) {
+  if (newUpdatedAt >= startTime) {
+    let averageAsBigInt: bigint = BigInt(average.times(MULTIPLICATION_FACTOR).toNumber())
+    const totalTime: bigint = BigInt(END_TIMESTAMP - startTime);
+    const bMultiplicationFactor: bigint = BigInt(MULTIPLICATION_FACTOR);
+    const timeLeft: bigint = BigInt(END_TIMESTAMP) - newUpdatedAt;
+    const amountToRemove: bigint = bMultiplicationFactor * oldBalance * timeLeft / totalTime;
+    averageAsBigInt -= amountToRemove;
+    const amountToAdd: bigint = bMultiplicationFactor * newBalance * timeLeft / totalTime
+    return BigDecimal(averageAsBigInt + amountToAdd).div(MULTIPLICATION_FACTOR)
+  } else {
+    return BigDecimal(newBalance)
+  }
 }
 
 function extractTransferEvents(ctx: ProcessorContext<Store>): TransferEvent[] {

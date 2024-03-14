@@ -1,3 +1,4 @@
+import {BigDecimal} from "@subsquid/big-decimal"
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
 
@@ -21,8 +22,8 @@ export class Account {
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     balance!: bigint
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    averageBalance!: bigint
+    @Column_("numeric", {transformer: marshal.bigdecimalTransformer, nullable: false})
+    averageBalance!: BigDecimal
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     updatedAt!: bigint
