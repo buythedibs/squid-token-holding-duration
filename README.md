@@ -89,3 +89,4 @@ npm run lint
 4. [Project conventions](https://docs.subsquid.io/basics/squid-structure)
 5. [Graphql JSON body converter]https://datafetcher.com/graphql-json-body-converter
 6. [Squid Ink template (Arrowsquid)](https://github.com/subsquid-labs/squid-ink-template/tree/master)
+7. [BigDecimal](https://github.com/subsquid/squid-sdk/blob/e8104dc941504d3e88d630c0d43f0a65b38a3c48/util/big-decimal/bigdecimal.d.ts#L6)
