@@ -1,7 +1,8 @@
 type Account @entity {
+  id: ID!
   wallet: String! @index
   token: String! @index
   balance: BigInt!
-  averageBalance: BigInt!
+  averageBalance: BigDecimal!
   updatedAt: BigInt!
 }

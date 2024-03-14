@@ -3,7 +3,7 @@
 import assert from 'assert';
 import { lookupArchive } from "@subsquid/archive-registry";
 import * as ss58 from "@subsquid/ss58";
-import { toHex } from "@subsquid/util-internal-hex";
+import { decodeHex, toHex } from "@subsquid/util-internal-hex";
 import {
   BlockHeader,
   DataHandlerContext,
@@ -14,6 +14,7 @@ import {
 import { Store, TypeormDatabase } from "@subsquid/typeorm-store";
 import * as psp34 from "./abi/psp34";
 import { Account } from "./model/generated";
+import { BigDecimal } from "@subsquid/big-decimal";
 
 export type Block = BlockHeader<Fields>
 export type Event = _Event<Fields>
@@ -34,10 +35,10 @@ const TOKENS: { [key: string]: Token; } = {
     averageBalanceCalculatedFromTimestamp: 1_709_215_200_000,
   }
 }
-let PSP34_ADDRESSES_SS58 = [];
-let PSP34_ADDRESSES = [];
-for (var key in TOKENS) {
-  let token: Token = TOKENS[key];
+const PSP34_ADDRESSES_SS58 = [];
+const PSP34_ADDRESSES: string[] = [];
+for (const key in TOKENS) {
+  const token: Token = TOKENS[key];
   if (token.type == 'PSP34') {
     PSP34_ADDRESSES_SS58.push(key)
     PSP34_ADDRESSES.push(toHex(ss58.decode(key).bytes))
@@ -45,6 +46,7 @@ for (var key in TOKENS) {
 }
 const SS58_PREFIX = ss58.decode(PSP34_ADDRESSES_SS58[0]).prefix;
 const END_TIMESTAMP = 1_719_216_000_000;
+const MULTIPLICATION_FACTOR = 1_000_000_000_000;
 
 const processor = new SubstrateBatchProcessor()
   .setDataSource({
@@ -64,125 +66,97 @@ const processor = new SubstrateBatchProcessor()
   })
   .setBlockRange({
     // 1 if lowest deployment height is unknown
-    from: 43_497_779
+    from: 43_497_779,
   })
 
-// processor.run(new TypeormDatabase({supportHotBlocks: true}), async ctx => {
-//   const cheques = extractCheques(ctx);
-//   const chequeUpdates = extractChequeUpdates(ctx);
+processor.run(new TypeormDatabase({supportHotBlocks: true}), async ctx => {
+  const transfers = extractTransferEvents(ctx);
 
-//   // 1. Create new cheques
-//   const newCheques = cheques.map((cheque) => {
-//     return new Cheque({
-//       id: cheque.id,
-//       from: cheque.from,
-//       to: cheque.to,
-//       amount: cheque.amount,
-//       tokenAddress: cheque.token_address,
-//       memo: cheque.memo,
-//       fee: cheque.fee,
-//       status: 0,
-//       recipientAzeroId: cheque.recipient_azero_id,
-//       senderAzeroId: cheque.sender_azero_id,
-//       createdAt: cheque.created_at,
-//       updatedAt: cheque.created_at,
-//     });
-//   });
-//   await ctx.store.insert(newCheques);
+  // 1. Create or update accounts
+  for (const transfer of transfers) {
+    const tokenDetails: Token = TOKENS[transfer.token];
+    if (transfer.from) {
+      const fromAccount = await ctx.store.get(Account, transfer.token + transfer.from);
+      if (fromAccount) {
+        fromAccount.balance -= transfer.amount;
+        fromAccount.updatedAt = transfer.updated_at;
+        fromAccount.averageBalance = calculateRunningAverage(fromAccount.averageBalance, fromAccount.balance + transfer.amount, fromAccount.balance, fromAccount.updatedAt, tokenDetails.averageBalanceCalculatedFromTimestamp, fromAccount.wallet);
+        await ctx.store.save(
+          fromAccount
+        );
+      }
+    }
+    let toAccount = await ctx.store.get(Account, transfer.token + transfer.to);
+    if (toAccount) {
+      toAccount.balance += transfer.amount
+      toAccount.updatedAt = transfer.updated_at
+    } else {
+      toAccount = new Account({
+        id: transfer.token + transfer.to,
+        wallet: transfer.to,
+        token: transfer.token,
+        balance: transfer.amount,
+        averageBalance: BigDecimal(0),
+        updatedAt: transfer.updated_at,
+      });
+    }
+    toAccount.averageBalance = calculateRunningAverage(toAccount.averageBalance, toAccount.balance - transfer.amount, toAccount.balance, toAccount.updatedAt, tokenDetails.averageBalanceCalculatedFromTimestamp, toAccount.wallet);
+    await ctx.store.save(
+      toAccount
+    );
+  }
+});
 
-//   // 2. Update cheques
-//   for (const gu of chequeUpdates) {
-//     const cheque = await ctx.store.get(Cheque, gu.id);
-//     if (cheque) {
-//       cheque.status = gu.status;
-//       cheque.updatedAt = gu.updated_at;
-//       await ctx.store.save(
-//         cheque
-//       );
-//     }
-//   }
-// });
+interface TransferEvent {
+  token: string;
+  from?: string;
+  to: string;
+  amount: bigint;
+  updated_at: bigint;
+}
 
-// interface ChequeCreateEvent {
-//   id: string;
-//   from: string;
-//   to: string;
-//   amount: bigint;
-//   token_address?: string;
-//   memo?: string;
-//   fee: bigint;
-//   recipient_azero_id?: string;
-//   sender_azero_id?: string;
-//   created_at: Date;
-// }
+function calculateRunningAverage(average: BigDecimal, oldBalance: bigint, newBalance: bigint, newUpdatedAt: bigint, startTime: number, wallet: string) {
+  if (newUpdatedAt >= startTime) {
+    let averageAsBigInt: bigint = BigInt(average.times(MULTIPLICATION_FACTOR).toNumber())
+    const totalTime: bigint = BigInt(END_TIMESTAMP - startTime);
+    const bMultiplicationFactor: bigint = BigInt(MULTIPLICATION_FACTOR);
+    const timeLeft: bigint = BigInt(END_TIMESTAMP) - newUpdatedAt;
+    const amountToRemove: bigint = bMultiplicationFactor * oldBalance * timeLeft / totalTime;
+    averageAsBigInt -= amountToRemove;
+    const amountToAdd: bigint = bMultiplicationFactor * newBalance * timeLeft / totalTime
+    return BigDecimal(averageAsBigInt + amountToAdd).div(MULTIPLICATION_FACTOR)
+  } else {
+    return BigDecimal(newBalance)
+  }
+}
 
-// // 1 => Collected
-// // 2 => Cancelled
-// interface ChequeUpdateEvent {
-//   id: string;
-//   status: number;
-//   updated_at: Date;
-// }
-
-// function extractCheques(ctx: ProcessorContext<Store>): ChequeCreateEvent[] {
-//   const cheques: ChequeCreateEvent[] = [];
-//   for (const block of ctx.blocks) {
-//     assert(block.header.timestamp, `Block ${block.header.height} had no timestamp`)
-//     for (const event of block.events) {
-//       if (
-//         event.name === "Contracts.ContractEmitted" &&
-//         event.args.contract === AZERO_PUNKS_CONTRACT_ADDRESS
-//       ) {
-//         const decodedEvent = psp34.decodeEvent(event.args.data);
-//         if (decodedEvent.__kind === "Create") {
-//           const cheque: ChequeCreateEvent = {
-//             id: String(decodedEvent.id),
-//             from: ss58.codec(SS58_PREFIX).encode(decodedEvent.from),
-//             to: ss58.codec(SS58_PREFIX).encode(decodedEvent.to),
-//             amount: decodedEvent.amount,
-//             token_address: undefined,
-//             memo: decodedEvent.memo,
-//             fee: decodedEvent.fee,
-//             recipient_azero_id: decodedEvent.recipientAzeroId,
-//             sender_azero_id: decodedEvent.senderAzeroId,
-//             created_at: new Date(block.header.timestamp)
-//           };
-//           if (decodedEvent.tokenAddress) {
-//             cheque.token_address = ss58.codec(SS58_PREFIX).encode(decodedEvent.tokenAddress)
-//           }
-//           cheques.push(cheque);
-//         }
-//       }
-//     }
-//   }
-//   return cheques;
-// }
-
-// function extractChequeUpdates(ctx: ProcessorContext<Store>): ChequeUpdateEvent[] {
-//   const chequeUpdateEvents: ChequeUpdateEvent[] = [];
-//   for (const block of ctx.blocks) {
-//     assert(block.header.timestamp, `Block ${block.header.height} had no timestamp`)
-//     for (const event of block.events) {
-//       if (
-//         event.name === "Contracts.ContractEmitted" &&
-//         event.args.contract === AZERO_PUNKS_CONTRACT_ADDRESS
-//       ) {
-//         const decodedEvent = psp34.decodeEvent(event.args.data);
-//         if (decodedEvent.__kind === "Cancel") {
-//           chequeUpdateEvents.push({
-//             id: String(decodedEvent.id),
-//             status: 2,
-//             updated_at: new Date(block.header.timestamp),
-//           });
-//         } else if (decodedEvent.__kind === "Collect") {
-//           chequeUpdateEvents.push({
-//             id: String(decodedEvent.id),
-//             status: 1,
-//             updated_at: new Date(block.header.timestamp),
-//           });
-//         }
-//       }
-//     }
-//   }
-//   return chequeUpdateEvents;
-// }
+function extractTransferEvents(ctx: ProcessorContext<Store>): TransferEvent[] {
+  const transfers: TransferEvent[] = [];
+  for (const block of ctx.blocks) {
+    assert(block.header.timestamp, `Block ${block.header.height} had no timestamp`)
+    for (const event of block.events) {
+      if (block.header.timestamp < END_TIMESTAMP) {
+        if (
+          event.name === "Contracts.ContractEmitted" &&
+          PSP34_ADDRESSES.includes(event.args.contract)
+        ) {
+          const decodedEvent = psp34.decodeEvent(event.args.data);
+          if (decodedEvent.__kind === "Transfer" && decodedEvent.to) {
+            const cheque: TransferEvent = {
+              token: ss58.codec(SS58_PREFIX).encode(decodeHex(event.args.contract)),
+              from: undefined,
+              to: ss58.codec(SS58_PREFIX).encode(decodedEvent.to),
+              amount: BigInt(1),
+              updated_at: BigInt(block.header.timestamp)
+            };
+            if (decodedEvent.from) {
+              cheque.from = ss58.codec(SS58_PREFIX).encode(decodedEvent.from)
+            }
+            transfers.push(cheque);
+          }
+        }
+      }
+    }
+  }
+  return transfers;
+}
